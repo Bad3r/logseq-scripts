@@ -1,5 +1,5 @@
-// abbreviate name space
-// ex: "root/foo/bar" -> "r/f/bar"
+// Abbreviate namespace
+// Eample: "root/foo/bar" -> "r/f/bar"
 function abbreviate(text, isTag) {
   return text.split('/').map((part, index, arr) => {
     if (index === arr.length - 1) {

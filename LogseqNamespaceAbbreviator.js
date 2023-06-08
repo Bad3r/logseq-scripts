@@ -1,33 +1,36 @@
 // Abbreviate namespace
 // Eample: "root/foo/bar" -> "r/f/bar"
 function abbreviate(text, isTag) {
-  return text.split('/').map((part, index, arr) => {
-    if (index === arr.length - 1) {
-      return part;
-    } else if (index === 0 && isTag) {
-      return part.substring(0, 2);
-    } else {
-      return part.charAt(0);
-    }
-  }).join('/');
+  return text
+    .split("/")
+    .map((part, index, arr) => {
+      if (index === arr.length - 1) {
+        return part;
+      } else if (index === 0 && isTag) {
+        return part.substring(0, 2);
+      } else {
+        return part.charAt(0);
+      }
+    })
+    .join("/");
 }
 
 function abbreviateNamespace(selector) {
   const appContainer = document.getElementById("app-container");
-  
+
   const handleNamespaceHover = (event) => {
     const namespaceRef = event.target.closest(selector);
     if (!namespaceRef) return;
 
-    if (event.type === 'mouseenter') {
+    if (event.type === "mouseenter") {
       namespaceRef.textContent = namespaceRef.dataset.origText;
-    } else if (event.type === 'mouseleave') {
+    } else if (event.type === "mouseleave") {
       namespaceRef.textContent = namespaceRef.dataset.abbreviatedText;
     }
   };
 
-  appContainer.addEventListener('mouseenter', handleNamespaceHover, true);
-  appContainer.addEventListener('mouseleave', handleNamespaceHover, true);
+  appContainer.addEventListener("mouseenter", handleNamespaceHover, true);
+  appContainer.addEventListener("mouseleave", handleNamespaceHover, true);
 
   const observer = new MutationObserver((mutationList) => {
     for (const mutation of mutationList) {
@@ -38,7 +41,9 @@ function abbreviateNamespace(selector) {
         for (const namespaceRef of namespaceRefs) {
           const text = namespaceRef.textContent;
           const isTag = namespaceRef.classList.contains("tag");
-          const testText = isTag ? text.substring(1).toLowerCase() : text.toLowerCase();
+          const testText = isTag
+            ? text.substring(1).toLowerCase()
+            : text.toLowerCase();
           if (testText !== namespaceRef.dataset.ref) continue;
 
           const abbreviatedText = abbreviate(text, isTag);
@@ -57,4 +62,6 @@ function abbreviateNamespace(selector) {
   });
 }
 
-abbreviateNamespace('.ls-block a.page-ref[data-ref*="/"], .foldable-title [data-ref*="/"], li[title*="root/"] .page-title, a.tag[data-ref*="/"]');
+abbreviateNamespace(
+  '.ls-block a.page-ref[data-ref*="/"], .foldable-title [data-ref*="/"], li[title*="root/"] .page-title, a.tag[data-ref*="/"], .title'
+);

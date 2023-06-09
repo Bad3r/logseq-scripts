@@ -5,11 +5,12 @@ function abbreviate(text, isTag) {
     .split("/")
     .map((part, index, arr) => {
       if (index === arr.length - 1) {
-        return part;
-      } else if (index === 0 && isTag) {
-        return part.substring(0, 2);
+        return part; // return the last part unabbreviated
       } else {
-        return part.charAt(0);
+        return part
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase())
+          .join(""); // abbreviate other parts and capitalize
       }
     })
     .join("/");
@@ -63,5 +64,5 @@ function abbreviateNamespace(selector) {
 }
 
 abbreviateNamespace(
-  '.ls-block a.page-ref[data-ref*="/"], .foldable-title [data-ref*="/"], li[title*="root/"] .page-title, a.tag[data-ref*="/"], .title'
+  '.ls-block a.page-ref[data-ref*="/"], .foldable-title [data-ref*="/"], li[title*="root/"] .page-title, a.tag[data-ref*="/"], .title[data-ref*="/"]'
 );

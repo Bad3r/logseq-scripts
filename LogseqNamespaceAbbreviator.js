@@ -1,19 +1,35 @@
-// Abbreviate namespace
-// Eample: "root/foo/bar" -> "r/f/bar"
-function abbreviate(text, isTag) {
-  return text
-    .split("/")
-    .map((part, index, arr) => {
-      if (index === arr.length - 1) {
-        return part; // return the last part unabbreviated
-      } else {
-        return part
-          .split(" ")
-          .map((word) => word.charAt(0).toUpperCase())
-          .join(""); // abbreviate other parts and capitalize
+// Abbreviate namespace, using icons in place of abbreviations if possible
+// Eample: "root/foo/bar" -> "r/f/bar" or "🌍/✈️/Plans"
+const pageIcons = new Map()
+
+function getAbbreviation(text) {
+  return text.split(" ")
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("")
+}
+
+function abbreviate(text) {
+  const chars = Array.from(text)
+  let abbreviatedLink = ''
+  chars.forEach( (char, i) => {
+    if (char === '/') {
+      // Selects all characters of original link up to the current '/'. This is to pass to the logseq api to find the page icon
+      const pageName = chars.slice(0,i).join('')
+
+      // Checks if the icon for the page already exists in the map, and adds it if it exists
+      if (!pageIcons.has(pageName)) {
+        const pageIcon = logseq.api.get_page(pageName)?.properties?.icon
+        if (pageIcon) {
+          pageIcons.set(pageName, pageIcon)
+        }
       }
-    })
-    .join("/");
+
+      // Add page icon from the map, or the abbreviation of the page/subpage
+      abbreviatedLink += `${pageIcons.get(pageName) || getAbbreviation(pageName.split('/').at(-1))}/`
+    }
+  })
+
+  abbreviatedLink += text.split('/').at(-1)
 }
 
 function abbreviateNamespace(selector) {
@@ -47,7 +63,7 @@ function abbreviateNamespace(selector) {
             : text.toLowerCase();
           if (testText !== namespaceRef.dataset.ref) continue;
 
-          const abbreviatedText = abbreviate(text, isTag);
+          const abbreviatedText = abbreviate(text);
 
           namespaceRef.dataset.origText = text;
           namespaceRef.dataset.abbreviatedText = abbreviatedText;

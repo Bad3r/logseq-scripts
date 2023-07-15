@@ -8,7 +8,7 @@ function getAbbreviation(text) {
     .join("")
 }
 
-function abbreviate(text) {
+function abbreviate(text, currentPage) {
   const chars = Array.from(text)
   let abbreviatedLink = ''
   chars.forEach( (char, i) => {
@@ -26,6 +26,9 @@ function abbreviate(text) {
 
       // Add page icon from the map, or the abbreviation of the page/subpage
       abbreviatedLink += `${pageIcons.get(pageName) || getAbbreviation(pageName.split('/').at(-1))}/`
+      if (pageName === currentPage) {
+        abbreviatedLink = './'
+      }
     }
   })
 
@@ -49,6 +52,8 @@ function abbreviateNamespace(selector) {
   appContainer.addEventListener("mouseenter", handleNamespaceHover, true);
   appContainer.addEventListener("mouseleave", handleNamespaceHover, true);
 
+  const currentPage = logseq.api.get_current_page()
+
   const observer = new MutationObserver((mutationList) => {
     for (const mutation of mutationList) {
       for (const node of mutation.addedNodes) {
@@ -63,7 +68,7 @@ function abbreviateNamespace(selector) {
             : text.toLowerCase();
           if (testText !== namespaceRef.dataset.ref) continue;
 
-          const abbreviatedText = abbreviate(text);
+          const abbreviatedText = abbreviate(text, currentPage?.originalName);
 
           namespaceRef.dataset.origText = text;
           namespaceRef.dataset.abbreviatedText = abbreviatedText;
